@@ -6,6 +6,8 @@ import { TiMessages } from "react-icons/ti";
 import { useAuthContext } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useSocketContext } from "../../context/SocketContext";
+import CallControls from "../call/CallControls";
+import VideoStream from "../call/VideoStream";
 
 const MessageContainer = () => {
 	const { selectedConversation, setSelectedConversation } = useConversation();
@@ -28,28 +30,33 @@ const MessageContainer = () => {
 							? 'from-white/60 to-white/40 border-b border-white/30' 
 							: 'from-black/40 to-black/20 border-b border-white/10'
 					} backdrop-blur-xl`}>
-						<div className='flex items-center gap-3'>
-							<div className={`relative w-10 h-10 rounded-full bg-gradient-to-r ${
-								theme === 'day' 
-									? 'from-blue-400 to-purple-500' 
-									: 'from-purple-400 to-pink-500'
-							} flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
-								{selectedConversation.fullName.charAt(0).toUpperCase()}
-								{/* Dynamic online indicator */}
-								{onlineUsers.includes(selectedConversation._id) && (
-									<div className='absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-lg animate-pulse'></div>
-								)}
+						<div className='flex items-center justify-between w-full pr-16'>
+							<div className='flex items-center gap-3'>
+								<div className={`relative w-10 h-10 rounded-full bg-gradient-to-r ${
+									theme === 'day' 
+										? 'from-blue-400 to-purple-500' 
+										: 'from-purple-400 to-pink-500'
+								} flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+									{selectedConversation.fullName.charAt(0).toUpperCase()}
+									{/* Dynamic online indicator */}
+									{onlineUsers.includes(selectedConversation._id) && (
+										<div className='absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-lg animate-pulse'></div>
+									)}
+								</div>
+								<div className="flex-1">
+									<h3 className={`font-semibold text-lg ${
+										theme === 'day' ? 'text-gray-800' : 'text-white'
+									}`}>{selectedConversation.fullName}</h3>
+									<p className={`text-sm ${
+										theme === 'day' ? 'text-gray-600' : 'text-gray-300'
+									}`}>
+										{onlineUsers.includes(selectedConversation._id) ? 'Online' : 'Offline'}
+									</p>
+								</div>
 							</div>
-							<div>
-								<h3 className={`font-semibold text-lg ${
-									theme === 'day' ? 'text-gray-800' : 'text-white'
-								}`}>{selectedConversation.fullName}</h3>
-								<p className={`text-sm ${
-									theme === 'day' ? 'text-gray-600' : 'text-gray-300'
-								}`}>
-									{onlineUsers.includes(selectedConversation._id) ? 'Online' : 'Offline'}
-								</p>
-							</div>
+							
+							{/* Call Controls */}
+							<CallControls />
 						</div>
 						{/* Glowing accent line */}
 						<div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${
@@ -58,6 +65,8 @@ const MessageContainer = () => {
 								: 'from-purple-400 via-pink-500 to-indigo-400'
 						} opacity-60`}></div>
 					</div>
+					{/* Video Stream Component */}
+					<VideoStream />
 					<Messages />
 					<MessageInput />
 				</>

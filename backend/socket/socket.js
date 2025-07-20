@@ -27,6 +27,47 @@ io.on("connection", (socket) => {
 	// io.emit() is used to send events to all the connected clients
 	io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
+	// WebRTC signaling events
+	socket.on("call:initiate", ({ to, from, offer, callType }) => {
+		const receiverSocketId = getReceiverSocketId(to);
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit("call:incoming", {
+				from,
+				offer,
+				callType, // 'video' or 'audio'
+				callId: `${from}-${to}-${Date.now()}`
+			});
+		}
+	});
+
+	socket.on("call:accept", ({ to, from, answer }) => {
+		const callerSocketId = getReceiverSocketId(to);
+		if (callerSocketId) {
+			io.to(callerSocketId).emit("call:accepted", { from, answer });
+		}
+	});
+
+	socket.on("call:reject", ({ to, from }) => {
+		const callerSocketId = getReceiverSocketId(to);
+		if (callerSocketId) {
+			io.to(callerSocketId).emit("call:rejected", { from });
+		}
+	});
+
+	socket.on("call:end", ({ to, from }) => {
+		const receiverSocketId = getReceiverSocketId(to);
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit("call:ended", { from });
+		}
+	});
+
+	socket.on("call:ice-candidate", ({ to, candidate }) => {
+		const receiverSocketId = getReceiverSocketId(to);
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit("call:ice-candidate", { candidate });
+		}
+	});
+
 	// socket.on() is used to listen to the events. can be used both on client and server side
 	socket.on("disconnect", () => {
 		console.log("user disconnected", socket.id);
